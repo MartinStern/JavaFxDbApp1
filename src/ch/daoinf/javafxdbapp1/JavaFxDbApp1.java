@@ -19,11 +19,12 @@ public class JavaFxDbApp1 extends Application {
     
     @Override
     public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("FXMLDocument.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("ui/PersonViewFXML.fxml"));
         
         Scene scene = new Scene(root);
         
         stage.setScene(scene);
+        stage.setTitle("PersonManager");
         stage.show();
     }
 

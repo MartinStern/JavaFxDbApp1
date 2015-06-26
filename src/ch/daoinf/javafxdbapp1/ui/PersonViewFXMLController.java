@@ -7,7 +7,9 @@ package ch.daoinf.javafxdbapp1.ui;
 
 import ch.daoinf.javafxdbapp1.model.Person;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -16,6 +18,10 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.StackPane;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.Query;
 
 /**
  * FXML Controller class
@@ -33,17 +39,22 @@ public class PersonViewFXMLController implements Initializable {
     
     private ObservableList persons;
     private Person currentPerson;
+    
+    final EntityManagerFactory emFactory = Persistence.createEntityManagerFactory("JavaFxDbApp1PU"); // Name kommt aus persitance.xml
+    final EntityManager em = emFactory.createEntityManager();
+            
+            
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // populate with data from database
-        updatePersonList();
+        populatePersonList();
         // setup table view
         setupTable();
         // setup button
-        setupButton();
+        //setupButton();
         
         
     }    
@@ -53,16 +64,27 @@ public class PersonViewFXMLController implements Initializable {
         TableColumn firstnameColumn = new TableColumn<Person, String>();
         firstnameColumn.setText("First Name");
         firstnameColumn.setMinWidth(100);
-        firstnameColumn.setCellFactory(new PropertyValueFactory("firstname"));
+        firstnameColumn.setCellValueFactory(new PropertyValueFactory("firstname"));
         
         // cloumn firstName
         TableColumn lastnameColumn = new TableColumn<Person, String>();
         lastnameColumn.setText("Last Name");
         lastnameColumn.setMinWidth(100);
-        lastnameColumn.setCellFactory(new PropertyValueFactory("lastname"));
+        lastnameColumn.setCellValueFactory(new PropertyValueFactory("lastname"));
         
         personTable.getColumns().addAll(firstnameColumn, lastnameColumn);
         personTable.setItems(persons);
     }
     
+    private void populatePersonList(){
+        Query query = em.createNamedQuery("Person.findAll");
+        List result = query.getResultList();
+        
+        if (persons == null){
+            persons = FXCollections.observableArrayList(result);
+        } else  {
+            persons.clear();
+            persons.addAll(result);
+        }
+    }
 }
